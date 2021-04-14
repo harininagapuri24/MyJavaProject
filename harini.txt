@@ -1,0 +1,503 @@
+<%@ page language="java" contentType="text/html" pageEncoding="ISO-8859-1"%>
+<%@ include file="CommonHeader.jsp" %>
+
+​<form action="Register" method="post" style="border:1px solid #ccc">
+
+  <div class="container">
+    <h1>Sign Up</h1>
+    <p>Please fill in this form to create an account.</p>
+    <hr>
+    
+    <label for="text"><b>User Name</b></label>
+    <input type="text" placeholder="Enter User Name" name="username" required>
+    
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="passwd" required>
+    
+    <label for="text"><b>Customer Name</b></label>
+    <input type="text" placeholder="Enter Customer Name" name="customerName" required>
+
+    <label for="gender"><b>Gender</b></label>
+    <input type="radio" name="gender" value="M">Male
+    <input type="radio" name="gender" value="F">Female
+	
+    <label for="mobileNo"><b>Mobile No</b></label>
+    <input type="text" placeholder="Enter Mobile Number" name="mobileNo" required>
+    
+    <label for="email"><b>Email Id</b></label>
+    <input type="text" placeholder="Enter Email" name="emailid" required>
+.
+    <label for="custAddr"><b>Customer Address</></label>
+    <textarea name="custAddr" cols="20" rows="5"></textarea>
+    
+    <div class="clearfix">
+      <button type="reset" class="cancelbtn">Reset</button>
+      <button type="submit" class="signupbtn">Sign Up</button>
+    </div>
+  </div>
+</form>
+</body>
+</html>
+
+@charset "ISO-8859-1";
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box}
+
+/* Full-width input fields */
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+
+/* Set a style for all buttons */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
+}
+
+button:hover {
+  opacity:1;
+}
+
+/* Extra styles for the cancel button */
+.cancelbtn {
+  padding: 14px 20px;
+  background-color: #f44336;
+}
+
+/* Float cancel and signup buttons and add an equal width */
+.cancelbtn, .signupbtn {
+  float: left;
+  width: 50%;
+}
+
+/* Add padding to container elements */
+.container {
+  padding: 16px;
+}
+
+/* Clear floats */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Change styles for cancel button and signup button on extra small screens */
+@media screen and (max-width: 300px) {
+  .cancelbtn, .signupbtn {
+     width: 100%;
+  }
+}
+
+<%@ page language="java" contentType="text/html"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title></title>
+<link rel="stylesheet" href="SignUp.css" type="text/css"/>
+<style>
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #4CAF50;
+}
+</style>
+
+</head>
+<body>
+
+<div style="background-color:gray;width:100%">
+<p align='right'>
+	<img src="images/facebook.png" width="30" height="30"/>
+
+</p>
+</div>
+
+<ul>
+  <li><a class="active" href="index.jsp">Home</a></li>
+  <li><a href="Login.jsp">Sign In</a></li>
+  <li><a href="Register.jsp">Sign Up</a></li>
+  <li><a href="#about">About</a></li>
+</ul>
+</body>
+</html>
+
+package Controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import dao.RegisterDAO;
+import model.Customer;
+
+@WebServlet("/Register")
+public class Register extends HttpServlet 
+{
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		response.setContentType("text/html");
+		PrintWriter out=response.getWriter();
+	
+		try
+		{
+		String username=request.getParameter("username");
+		String password1=request.getParameter("passwd");
+		String customerName=request.getParameter("customerName");
+		String gender=request.getParameter("gender");
+		String mobileNo=request.getParameter("mobileNo");
+		String emailid=request.getParameter("emailid");
+		String custAddr=request.getParameter("custAddr");
+		
+		out.println("User Name:"+username);
+		out.println("Password:"+password1);
+		out.println("Customer Name:"+customerName);
+		out.println("Gender:"+gender);
+		out.println("Mobile No:"+mobileNo);
+		out.println("emailId:"+emailid);
+		out.println("Customer Address"+custAddr);
+		
+		Customer customer=new Customer(username,password1,customerName,gender,mobileNo,emailid,custAddr);
+		
+		RegisterDAO registerDAO=new RegisterDAO();
+		
+			if(registerDAO.registerCustomer(customer))
+			{
+				request.setAttribute("username", customer.getUsername());
+				RequestDispatcher dispatch=request.getRequestDispatcher("UserHome.jsp");
+				dispatch.forward(request, response);
+			}
+			else
+			{
+				request.setAttribute("errorInfo","Error Occured During Registering");
+				RequestDispatcher dispatch=request.getRequestDispatcher("ErrorPage.jsp");
+				dispatch.forward(request, response);
+			}
+		
+		}
+		catch(Exception e)
+		{
+			request.setAttribute("errorInfo","Error Occured During Registering::::"+e.getMessage());
+			RequestDispatcher dispatch=request.getRequestDispatcher("ErrorPage.jsp");
+			dispatch.forward(request, response);
+		}
+		
+	}
+
+}
+
+package model;
+
+public class Customer {
+	String username;
+	String password;
+	String customerName;
+	String gender;
+	String emailId;
+	String mobileNo;
+	String address;
+	
+	public Customer() {}
+	
+	public Customer(String username,String password,String cName,String gender,String emailid,String mobileNo,String address)
+	{
+		this.username=username;
+		this.password=password;
+		this.customerName=cName;
+		this.gender=gender;
+		this.emailId=emailid;
+		this.mobileNo=mobileNo;
+		this.address=address;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+
+	public String getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+}
+
+package utility;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class DBConn 
+{
+	static Connection conn;
+	public static Connection getMySQLConnection()throws Exception
+	{
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/s210246","root","harikadimpu23@");
+		return conn;
+	}
+}
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import model.Customer;
+import utility.DBConn;
+
+public class RegisterDAO 
+{
+	Connection conn;
+	public RegisterDAO()throws Exception
+	{
+		conn=DBConn.getMySQLConnection();
+	}
+	
+	public boolean registerCustomer(Customer customer)throws SQLException
+	{
+		PreparedStatement psmt=conn.prepareStatement("insert into customer values(?,?,?,?,?,?,?)");
+		
+		psmt.setString(1, customer.getUsername());
+		psmt.setString(2, customer.getPassword());
+		psmt.setString(3, customer.getCustomerName());
+		psmt.setString(4, customer.getGender());
+		psmt.setString(5, customer.getEmailId());
+		psmt.setString(6,customer.getMobileNo());
+		psmt.setString(7, customer.getAddress());
+	
+		int row_eff=psmt.executeUpdate();
+		
+		if(row_eff>0)
+			return true;
+		else
+			return false;
+	}
+	
+	public Customer checkCredential(Customer customer)throws SQLException
+	{
+		PreparedStatement psmt=conn.prepareStatement("select * from Customer where username=? and password1=?");
+		
+		psmt.setString(1, customer.getUsername());
+		psmt.setString(2, customer.getPassword());
+		
+		ResultSet rs=psmt.executeQuery();
+		
+		if(rs.next())
+		{
+			customer.setCustomerName(rs.getString(3));
+		}
+		else
+		{
+			customer=null;
+		}
+		
+		return customer;
+	}
+}
+
+<%@ page language="java" contentType="text/html" pageEncoding="ISO-8859-1"%>
+<%@include file="CommonHeader.jsp" %>
+<h3 align="center">Login Dialog</h3>
+
+<form action="LoginCheck" method="post" style="border:1px solid #ccc">
+
+  	<div class="container">
+    <h1>Sign In</h1>
+    <p>Please Provide the Credential to Sign in to Page</p>
+    <hr>
+    
+    <label for="text"><b>User Name</b></label>
+    <input type="text" placeholder="Enter User Name" name="username" required>
+    
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="passwd" required>
+    
+ 	<div class="clearfix">
+      <button type="reset" class="cancelbtn">Reset</button>
+      <button type="submit" class="signupbtn">Sign In</button>
+    </div>
+    
+  	</div>
+</form>
+
+</body>
+</html>
+
+package Controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import dao.RegisterDAO;
+import model.Customer;
+
+
+@WebServlet("/LoginCheck")
+public class LoginCheck extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		response.setContentType("text/html");
+		PrintWriter out=response.getWriter();
+	
+		try
+		{
+		String username=request.getParameter("username");
+		String password1=request.getParameter("passwd");
+		
+		Customer customer=new Customer();
+		customer.setUsername(username);
+		customer.setPassword(password1);
+		
+		RegisterDAO registerDAO=new RegisterDAO();
+		Customer customer1=registerDAO.checkCredential(customer);
+		
+		if(customer1!=null)
+		{
+			request.setAttribute("username", customer.getUsername());
+			RequestDispatcher dispatch=request.getRequestDispatcher("UserHome.jsp");
+			dispatch.forward(request, response);
+		}
+		else
+		{
+			request.setAttribute("errorInfo","Error Occured During Logging");
+			RequestDispatcher dispatch=request.getRequestDispatcher("ErrorPage.jsp");
+			dispatch.forward(request, response);
+		}
+		
+		}
+		catch(Exception e)
+		{
+			request.setAttribute("errorInfo","Error Occured During Logging::::"+e.getMessage());
+			RequestDispatcher dispatch=request.getRequestDispatcher("ErrorPage.jsp");
+			dispatch.forward(request, response);
+		}
+	}
+
+}
+
+<%@ page language="java" contentType="text/html" pageEncoding="ISO-8859-1"%>
+<%@ include file="CommonHeader.jsp" %>
+
+Welcome : ${requestScope.username}
+
+</body>
+</html>
+<%@ page language="java" contentType="text/html" pageEncoding="ISO-8859-1"%>
+<%@ include file="CommonHeader.jsp" %>
+
+<font face="calibri" size="4" color="red">
+${requestScope.errorInfo}
+</font>
+
+</body>
+</html>
+
